@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, Stethoscope, Loader2, AlertTriangle } from "lucide-react";
+import { Send, Stethoscope, Loader2, AlertTriangle, Activity, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,62 +47,79 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8 px-4 sm:py-12">
+    <div className="min-h-screen gradient-bg relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl floating" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/5 rounded-full blur-3xl floating" style={{ animationDelay: '-2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-3xl" />
+      </div>
+
+      <div className="container max-w-4xl py-10 px-4 sm:py-16 relative z-10">
         {/* Header */}
-        <header className="text-center mb-8 sm:mb-12 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <Stethoscope className="w-8 h-8 text-primary" />
+        <header className="text-center mb-10 sm:mb-14 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent mb-6 glow-primary">
+            <Stethoscope className="w-10 h-10 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-3">
-            Akut Differentialdiagnostik
+          <h1 className="text-4xl sm:text-5xl font-display font-bold mb-4 tracking-tight">
+            <span className="gradient-text">Akut</span>{" "}
+            <span className="text-foreground">Differentialdiagnostik</span>
           </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Beskriv patientens symtom och anamnes för att få AI-baserade förslag på differentialdiagnoser
+          <p className="text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
+            Beskriv patientens symtom och anamnes för AI-baserade förslag på differentialdiagnoser
           </p>
         </header>
 
         {/* Disclaimer */}
-        <Alert className="mb-8 border-warning/30 bg-warning/5">
-          <AlertTriangle className="h-4 w-4 text-warning" />
-          <AlertDescription className="text-sm text-muted-foreground">
-            <strong className="text-foreground">Viktigt:</strong> Detta verktyg är endast för utbildnings- och referenssyfte. 
+        <Alert className="mb-8 glass-card border-warning/20 animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <AlertTriangle className="h-5 w-5 text-warning" />
+          <AlertDescription className="text-sm text-muted-foreground ml-2">
+            <strong className="text-foreground font-semibold">Viktigt:</strong> Detta verktyg är endast för utbildnings- och referenssyfte. 
             Det ersätter inte klinisk bedömning eller läkarkonsultation.
           </AlertDescription>
         </Alert>
 
         {/* Input Form */}
-        <Card className="mb-8 border-border/50 shadow-sm">
+        <Card className="mb-8 glass-card animate-slide-up" style={{ animationDelay: '200ms' }}>
           <CardHeader className="pb-4">
-            <CardTitle className="font-display text-xl">Symtom & Anamnes</CardTitle>
-            <CardDescription>
-              Beskriv aktuella symtom, duration, svårighetsgrad, och relevant sjukdomshistoria
-            </CardDescription>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10">
+                <Activity className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="font-display text-xl">Symtom & Anamnes</CardTitle>
+                <CardDescription className="mt-1">
+                  Beskriv aktuella symtom, duration, svårighetsgrad, och relevant sjukdomshistoria
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Textarea
-                value={symptoms}
-                onChange={(e) => setSymptoms(e.target.value)}
-                placeholder="Exempel: 65-årig man med plötslig bröstsmärta sedan 2 timmar, utstrålning till vänster arm, illamående, kallsvettig. Tidigare hypertoni och diabetes typ 2. Röker 20 cigaretter/dag."
-                className="min-h-[150px] resize-y text-base leading-relaxed"
-                disabled={isLoading}
-              />
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="relative">
+                <Textarea
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder="Exempel: 65-årig man med plötslig bröstsmärta sedan 2 timmar, utstrålning till vänster arm, illamående, kallsvettig. Tidigare hypertoni och diabetes typ 2. Röker 20 cigaretter/dag."
+                  className="min-h-[160px] resize-y text-base leading-relaxed bg-background/50 border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all rounded-xl"
+                  disabled={isLoading}
+                />
+              </div>
               <div className="flex justify-end">
                 <Button
                   type="submit"
                   disabled={isLoading || !symptoms.trim()}
                   size="lg"
-                  className="gap-2 font-medium"
+                  className="gap-2 font-semibold px-6 rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300"
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       Analyserar...
                     </>
                   ) : (
                     <>
-                      <Send className="w-4 h-4" />
+                      <Sparkles className="w-5 h-5" />
                       Analysera symtom
                     </>
                   )}
@@ -114,14 +131,9 @@ const Index = () => {
 
         {/* Results */}
         {results && (
-          <Card className="border-border/50 shadow-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="font-display text-xl">Resultat</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DiagnosisResults results={results} />
-            </CardContent>
-          </Card>
+          <div className="animate-scale-in">
+            <DiagnosisResults results={results} />
+          </div>
         )}
       </div>
     </div>
