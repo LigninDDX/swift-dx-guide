@@ -160,17 +160,16 @@ export function ManagementSection({ handlaggning }: ManagementSectionProps) {
             <h4 className="font-display font-semibold text-lg text-foreground">Empirisk behandling</h4>
           </div>
           
-          <div className="space-y-2">
+          <div className="text-sm space-y-1">
             {handlaggning.empirisk_behandling.map((behandling, index) => (
-              <div key={index} className="p-3 rounded-lg bg-muted/30 border border-border/50">
-                <p className="text-sm font-medium text-primary mb-1">{behandling.indikation}</p>
-                <p className="text-foreground text-sm">{behandling.behandling}</p>
-                {behandling.viktigt && (
-                  <div className="flex items-start gap-2 mt-2 p-2 rounded-lg bg-warning/10 border border-warning/20">
-                    <AlertTriangle className="w-3.5 h-3.5 text-warning mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-warning">{behandling.viktigt}</p>
-                  </div>
-                )}
+              <div key={index}>
+                <p className="text-muted-foreground">
+                  <span className="font-medium text-foreground">{behandling.indikation}:</span>{' '}
+                  {behandling.behandling}
+                  {behandling.viktigt && (
+                    <span className="text-warning ml-1">⚠ {behandling.viktigt}</span>
+                  )}
+                </p>
               </div>
             ))}
           </div>
