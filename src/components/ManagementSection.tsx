@@ -122,23 +122,16 @@ export function ManagementSection({ handlaggning }: ManagementSectionProps) {
                     </div>
                     
                     {isLab && groupKeys.length > 0 ? (
-                      <ul className="space-y-1.5">
-                        {groupKeys.map((groupName) => (
-                          <li key={groupName} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                            <span>
-                              <span className="font-medium text-foreground">{groupName}</span>
-                              <span className="text-muted-foreground/70"> ({grouped[groupName].join(', ')})</span>
-                            </span>
-                          </li>
+                      <p className="text-sm text-muted-foreground">
+                        {groupKeys.map((groupName, idx) => (
+                          <span key={groupName}>
+                            <span className="font-medium text-foreground">{groupName}</span>
+                            <span className="text-muted-foreground/70"> ({grouped[groupName].join(', ')})</span>
+                            {idx < groupKeys.length - 1 || ungrouped.length > 0 ? ', ' : ''}
+                          </span>
                         ))}
-                        {ungrouped.map((item, i) => (
-                          <li key={`ungrouped-${i}`} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
+                        {ungrouped.length > 0 && ungrouped.join(', ')}
+                      </p>
                     ) : (
                       <ul className="space-y-1.5">
                         {utredning.undersokningar.map((undersokning, i) => (
@@ -166,15 +159,15 @@ export function ManagementSection({ handlaggning }: ManagementSectionProps) {
             <h4 className="font-display font-semibold text-lg text-foreground">Empirisk behandling</h4>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {handlaggning.empirisk_behandling.map((behandling, index) => (
-              <div key={index} className="p-4 rounded-xl bg-muted/30 border border-border/50">
-                <p className="text-sm font-medium text-primary mb-2">{behandling.indikation}</p>
-                <p className="text-foreground mb-2">{behandling.behandling}</p>
+              <div key={index} className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                <p className="text-sm font-medium text-primary mb-1">{behandling.indikation}</p>
+                <p className="text-foreground text-sm">{behandling.behandling}</p>
                 {behandling.viktigt && (
-                  <div className="flex items-start gap-2 mt-3 p-2 rounded-lg bg-warning/10 border border-warning/20">
-                    <AlertTriangle className="w-4 h-4 text-warning mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-warning">{behandling.viktigt}</p>
+                  <div className="flex items-start gap-2 mt-2 p-2 rounded-lg bg-warning/10 border border-warning/20">
+                    <AlertTriangle className="w-3.5 h-3.5 text-warning mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-warning">{behandling.viktigt}</p>
                   </div>
                 )}
               </div>
