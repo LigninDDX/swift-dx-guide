@@ -41,6 +41,8 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
   const config = probabilityConfig[diagnosis.sannolikhet];
   const hasExpandableContent = diagnosis.beskrivning || diagnosis.varningsflaggor?.length || diagnosis.utredning?.length;
 
+  const isExpandable = diagnosis.kort_motivering || hasExpandableContent;
+
   return (
     <div 
       className="animate-slide-up group"
@@ -51,8 +53,8 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
         <div className={`h-1 ${config.indicator}`} />
         
         <div 
-          className={`p-5 ${hasExpandableContent ? 'cursor-pointer' : ''}`}
-          onClick={() => hasExpandableContent && setExpanded(!expanded)}
+          className={`p-5 ${isExpandable ? 'cursor-pointer' : ''}`}
+          onClick={() => isExpandable && setExpanded(!expanded)}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
@@ -79,13 +81,8 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
                   {config.label}
                 </Badge>
               </div>
-              {diagnosis.kort_motivering && (
-                <p className="text-sm text-muted-foreground mt-2 ml-11">
-                  {diagnosis.kort_motivering}
-                </p>
-              )}
             </div>
-            {hasExpandableContent && (
+            {isExpandable && (
               <button className="p-2 rounded-xl hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground">
                 {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
               </button>
@@ -95,9 +92,16 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
         
         {expanded && (
           <div className="px-5 pb-5 space-y-5 animate-fade-in border-t border-border/30 pt-5">
-            <p className="text-muted-foreground leading-relaxed">
-              {diagnosis.beskrivning}
-            </p>
+            {diagnosis.kort_motivering && (
+              <p className="text-muted-foreground leading-relaxed">
+                {diagnosis.kort_motivering}
+              </p>
+            )}
+            {diagnosis.beskrivning && (
+              <p className="text-muted-foreground leading-relaxed">
+                {diagnosis.beskrivning}
+              </p>
+            )}
 
             {diagnosis.varningsflaggor && diagnosis.varningsflaggor.length > 0 && (
               <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20 space-y-3">
