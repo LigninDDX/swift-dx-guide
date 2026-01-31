@@ -122,16 +122,17 @@ export function ManagementSection({ handlaggning }: ManagementSectionProps) {
                     </div>
                     
                     {isLab && groupKeys.length > 0 ? (
-                      <p className="text-sm text-muted-foreground">
-                        {groupKeys.map((groupName, idx) => (
-                          <span key={groupName}>
-                            <span className="font-medium text-foreground">{groupName}</span>
-                            <span className="text-muted-foreground/70"> ({grouped[groupName].join(', ')})</span>
-                            {idx < groupKeys.length - 1 || ungrouped.length > 0 ? ', ' : ''}
-                          </span>
+                      <div className="text-sm space-y-0.5">
+                        {groupKeys.map((groupName) => (
+                          <p key={groupName} className="text-muted-foreground">
+                            <span className="font-medium text-foreground">{groupName}:</span>{' '}
+                            {grouped[groupName].join(', ')}
+                          </p>
                         ))}
-                        {ungrouped.length > 0 && ungrouped.join(', ')}
-                      </p>
+                        {ungrouped.length > 0 && (
+                          <p className="text-muted-foreground">{ungrouped.join(', ')}</p>
+                        )}
+                      </div>
                     ) : (
                       <ul className="space-y-1.5">
                         {utredning.undersokningar.map((undersokning, i) => (
