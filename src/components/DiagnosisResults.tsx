@@ -1,7 +1,46 @@
-import { AlertCircle, FileText, ListChecks, ShieldAlert, Stethoscope, Pill, BookOpen, ArrowRight } from "lucide-react";
+import { AlertCircle, FileText, ListChecks, ShieldAlert, Stethoscope, Pill, BookOpen, ArrowRight, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DiagnosisCard } from "./DiagnosisCard";
 import { ManagementSection } from "./ManagementSection";
+
+// Map common Swedish medical sources to their URLs
+const sourceUrlMap: Record<string, string> = {
+  "internetmedicin": "https://www.internetmedicin.se",
+  "fass": "https://www.fass.se",
+  "läkartidningen": "https://lakartidningen.se",
+  "socialstyrelsen": "https://www.socialstyrelsen.se",
+  "1177": "https://www.1177.se",
+  "1177 vårdguiden": "https://www.1177.se",
+  "vårdguiden": "https://www.1177.se",
+  "janusinfo": "https://janusinfo.se",
+  "läkemedelsverket": "https://www.lakemedelsverket.se",
+  "folkhälsomyndigheten": "https://www.folkhalsomyndigheten.se",
+  "rikshandboken": "https://www.rikshandboken-bhv.se",
+  "viss": "https://viss.nu",
+  "terapi­rekommendationer": "https://janusinfo.se/behandling",
+  "strama": "https://strama.se",
+  "medibas": "https://medibas.se",
+  "praktiskmedicin": "https://www.praktiskmedicin.se",
+  "praktisk medicin": "https://www.praktiskmedicin.se",
+};
+
+function getSourceUrl(source: string): string | null {
+  // Check if it's already a URL
+  if (source.startsWith("http://") || source.startsWith("https://")) {
+    return source;
+  }
+  
+  // Try to match against known sources (case-insensitive)
+  const normalized = source.toLowerCase().trim();
+  
+  for (const [key, url] of Object.entries(sourceUrlMap)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return url;
+    }
+  }
+  
+  return null;
+}
 
 interface Diagnosis {
   diagnos: string;
@@ -104,14 +143,31 @@ export function DiagnosisResults({ results }: DiagnosisResultsProps) {
             <div className="flex-1">
               <h3 className="font-display font-semibold text-foreground mb-3">Medicinska källor</h3>
               <div className="flex flex-wrap gap-2">
-                {results.kallor.map((kalla, index) => (
-                  <span 
-                    key={index}
-                    className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm"
-                  >
-                    {kalla}
-                  </span>
-                ))}
+                {results.kallor.map((kalla, index) => {
+                  const url = getSourceUrl(kalla);
+                  if (url) {
+                    return (
+                      <a
+                        key={index}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                      >
+                        {kalla}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <span 
+                      key={index}
+                      className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm"
+                    >
+                      {kalla}
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>
