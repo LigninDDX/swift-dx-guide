@@ -1,11 +1,14 @@
-import { AlertTriangle, Beaker, ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
+import { AlertTriangle, Beaker, ChevronDown, ChevronUp, TrendingUp, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
 interface Diagnosis {
   diagnos: string;
   sannolikhet: "hög" | "medel" | "låg";
-  beskrivning: string;
+  kritisk?: boolean;
+  kort_motivering?: string;
+  // Legacy fields for backwards compatibility
+  beskrivning?: string;
   varningsflaggor?: string[];
   utredning?: string[];
 }
@@ -19,23 +22,24 @@ const probabilityConfig = {
   hög: {
     badge: "bg-destructive/10 text-destructive border-destructive/30 hover:bg-destructive/15",
     indicator: "bg-gradient-to-r from-destructive to-destructive/80",
-    label: "Hög sannolikhet",
+    label: "Hög",
   },
   medel: {
     badge: "bg-warning/10 text-warning border-warning/30 hover:bg-warning/15",
     indicator: "bg-gradient-to-r from-warning to-warning/80",
-    label: "Medel sannolikhet",
+    label: "Medel",
   },
   låg: {
     badge: "bg-muted text-muted-foreground border-border hover:bg-muted/80",
     indicator: "bg-gradient-to-r from-muted-foreground/50 to-muted-foreground/30",
-    label: "Låg sannolikhet",
+    label: "Låg",
   },
 };
 
 export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
-  const [expanded, setExpanded] = useState(index === 0);
+  const [expanded, setExpanded] = useState(false);
   const config = probabilityConfig[diagnosis.sannolikhet];
+  const hasExpandableContent = diagnosis.beskrivning || diagnosis.varningsflaggor?.length || diagnosis.utredning?.length;
 
   return (
     <div 
@@ -47,30 +51,45 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
         <div className={`h-1 ${config.indicator}`} />
         
         <div 
-          className="p-5 cursor-pointer"
-          onClick={() => setExpanded(!expanded)}
+          className={`p-5 ${hasExpandableContent ? 'cursor-pointer' : ''}`}
+          onClick={() => hasExpandableContent && setExpanded(!expanded)}
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-2">
                 <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 text-primary text-sm font-display font-bold">
                   {index + 1}
                 </span>
-                <h3 className="text-lg font-display font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                <h3 className="text-lg font-display font-semibold text-foreground group-hover:text-primary transition-colors">
                   {diagnosis.diagnos}
                 </h3>
+                {diagnosis.kritisk && (
+                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
+                    <ShieldAlert className="w-3 h-3 mr-1" />
+                    Kritisk
+                  </Badge>
+                )}
               </div>
-              <Badge 
-                variant="outline" 
-                className={`${config.badge} font-medium transition-colors`}
-              >
-                <TrendingUp className="w-3 h-3 mr-1.5" />
-                {config.label}
-              </Badge>
+              <div className="flex items-center gap-2 ml-11">
+                <Badge 
+                  variant="outline" 
+                  className={`${config.badge} font-medium transition-colors`}
+                >
+                  <TrendingUp className="w-3 h-3 mr-1.5" />
+                  {config.label}
+                </Badge>
+              </div>
+              {diagnosis.kort_motivering && (
+                <p className="text-sm text-muted-foreground mt-2 ml-11">
+                  {diagnosis.kort_motivering}
+                </p>
+              )}
             </div>
-            <button className="p-2 rounded-xl hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground">
-              {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
+            {hasExpandableContent && (
+              <button className="p-2 rounded-xl hover:bg-muted/80 transition-colors text-muted-foreground hover:text-foreground">
+                {expanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              </button>
+            )}
           </div>
         </div>
         

@@ -1,17 +1,43 @@
-import { AlertCircle, FileText, ListChecks, ShieldAlert } from "lucide-react";
+import { AlertCircle, FileText, ListChecks, ShieldAlert, Stethoscope, Pill, BookOpen, ArrowRight } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DiagnosisCard } from "./DiagnosisCard";
+import { ManagementSection } from "./ManagementSection";
+
+interface Diagnosis {
+  diagnos: string;
+  sannolikhet: "hög" | "medel" | "låg";
+  kritisk?: boolean;
+  kort_motivering?: string;
+  // Legacy fields for backwards compatibility
+  beskrivning?: string;
+  varningsflaggor?: string[];
+  utredning?: string[];
+}
+
+interface Utredning {
+  typ: string;
+  undersokningar: string[];
+  prioritet: "akut" | "skyndsam" | "elektiv";
+}
+
+interface Behandling {
+  indikation: string;
+  behandling: string;
+  viktigt?: string;
+}
+
+interface Handlaggning {
+  utredning?: Utredning[];
+  empirisk_behandling?: Behandling[];
+  disposition?: string;
+}
 
 interface DiagnosisResult {
-  diagnoser?: Array<{
-    diagnos: string;
-    sannolikhet: "hög" | "medel" | "låg";
-    beskrivning: string;
-    varningsflaggor?: string[];
-    utredning?: string[];
-  }>;
+  diagnoser?: Diagnosis[];
   akut_varning?: string | null;
   sammanfattning?: string;
+  handlaggning?: Handlaggning;
+  kallor?: string[];
   raw?: string;
 }
 
@@ -30,6 +56,7 @@ export function DiagnosisResults({ results }: DiagnosisResultsProps) {
 
   return (
     <div className="space-y-6">
+      {/* Akut varning först */}
       {results.akut_varning && (
         <Alert variant="destructive" className="border-destructive/30 bg-destructive/5 rounded-2xl animate-scale-in">
           <ShieldAlert className="h-5 w-5" />
@@ -40,23 +67,10 @@ export function DiagnosisResults({ results }: DiagnosisResultsProps) {
         </Alert>
       )}
 
-      {results.sammanfattning && (
-        <div className="glass-card rounded-2xl p-5 animate-slide-up" style={{ animationDelay: '50ms' }}>
-          <div className="flex items-start gap-4">
-            <div className="p-2.5 rounded-xl bg-accent/10 flex-shrink-0">
-              <FileText className="h-5 w-5 text-accent" />
-            </div>
-            <div>
-              <h3 className="font-display font-semibold text-foreground mb-2">Sammanfattning</h3>
-              <p className="text-muted-foreground leading-relaxed">{results.sammanfattning}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Differentialdiagnoser */}
       {results.diagnoser && results.diagnoser.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 animate-slide-up" style={{ animationDelay: '100ms' }}>
+          <div className="flex items-center gap-3 animate-slide-up" style={{ animationDelay: '50ms' }}>
             <div className="p-2 rounded-xl bg-primary/10">
               <ListChecks className="w-5 h-5 text-primary" />
             </div>
@@ -71,6 +85,50 @@ export function DiagnosisResults({ results }: DiagnosisResultsProps) {
             {results.diagnoser.map((diagnosis, index) => (
               <DiagnosisCard key={index} diagnosis={diagnosis} index={index} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Handläggning */}
+      {results.handlaggning && (
+        <ManagementSection handlaggning={results.handlaggning} />
+      )}
+
+      {/* Källor */}
+      {results.kallor && results.kallor.length > 0 && (
+        <div className="glass-card rounded-2xl p-5 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <div className="flex items-start gap-4">
+            <div className="p-2.5 rounded-xl bg-accent/10 flex-shrink-0">
+              <BookOpen className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display font-semibold text-foreground mb-3">Medicinska källor</h3>
+              <div className="flex flex-wrap gap-2">
+                {results.kallor.map((kalla, index) => (
+                  <span 
+                    key={index}
+                    className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm"
+                  >
+                    {kalla}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Legacy sammanfattning för bakåtkompatibilitet */}
+      {results.sammanfattning && !results.handlaggning && (
+        <div className="glass-card rounded-2xl p-5 animate-slide-up" style={{ animationDelay: '50ms' }}>
+          <div className="flex items-start gap-4">
+            <div className="p-2.5 rounded-xl bg-accent/10 flex-shrink-0">
+              <FileText className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <h3 className="font-display font-semibold text-foreground mb-2">Sammanfattning</h3>
+              <p className="text-muted-foreground leading-relaxed">{results.sammanfattning}</p>
+            </div>
           </div>
         </div>
       )}
