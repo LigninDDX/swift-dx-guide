@@ -147,16 +147,15 @@ export function DiagnosisResults({ results }: DiagnosisResultsProps) {
                   const url = getSourceUrl(kalla);
                   if (url) {
                     return (
-                      <a
+                      <button
                         key={index}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        type="button"
+                        onClick={() => window.open(url, '_blank', 'noopener,noreferrer')}
                         className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-sm hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer inline-flex items-center gap-1.5"
                       >
                         {kalla}
                         <ExternalLink className="w-3 h-3" />
-                      </a>
+                      </button>
                     );
                   }
                   return (
