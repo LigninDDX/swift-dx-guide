@@ -1,4 +1,4 @@
-import { AlertTriangle, Beaker, ChevronDown, ChevronUp, TrendingUp, ShieldAlert } from "lucide-react";
+import { AlertTriangle, Beaker, ChevronDown, ChevronUp, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
@@ -65,12 +65,6 @@ export function DiagnosisCard({ diagnosis, index }: DiagnosisCardProps) {
                 <h3 className="text-lg font-display font-semibold text-foreground group-hover:text-primary transition-colors">
                   {diagnosis.diagnos}
                 </h3>
-                {diagnosis.kritisk && (
-                  <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30">
-                    <ShieldAlert className="w-3 h-3 mr-1" />
-                    Kritisk
-                  </Badge>
-                )}
               </div>
               <div className="flex items-center gap-2 ml-11">
                 <Badge 
