@@ -38,6 +38,47 @@ const prioritetConfig = {
   },
 };
 
+// Lab grouping patterns
+const labGroups: { name: string; patterns: RegExp[] }[] = [
+  { name: "Blodstatus", patterns: [/^hb$/i, /^lpk$/i, /^tpk$/i, /^b-lpk/i, /^b-hb/i, /^b-tpk/i, /^mcv/i, /^mch/i, /leukocyt/i, /trombocyt/i, /hemoglobin/i, /erytrocyt/i, /hematokrit/i, /diff/i] },
+  { name: "Elektrolyter", patterns: [/^na$/i, /^k$/i, /^ca$/i, /^mg$/i, /^fosfat/i, /natrium/i, /kalium/i, /kalcium/i, /magnesium/i, /klorid/i, /^s-na/i, /^s-k/i, /^s-ca/i, /^p-na/i, /^p-k/i] },
+  { name: "Njurfunktion", patterns: [/krea/i, /urea/i, /egfr/i, /cystatin/i, /^s-krea/i] },
+  { name: "Leverprover", patterns: [/^alat/i, /^asat/i, /^alp/i, /^gt$/i, /^ggt/i, /bilirubin/i, /^ld$/i, /albumin/i, /lever/i, /^s-alat/i, /^s-asat/i, /^s-alp/i, /^s-bilirubin/i] },
+  { name: "Infektionsprover", patterns: [/^crp$/i, /prokalcitonin/i, /procalcitonin/i, /^pct$/i, /leukocyt/i, /^s-crp/i, /^p-crp/i, /sr$/i, /sänka/i] },
+  { name: "Koagulation", patterns: [/^pk$/i, /^inr$/i, /^aptt$/i, /fibrinogen/i, /d-dimer/i, /koagul/i, /^p-pk/i, /^p-aptt/i] },
+  { name: "Hjärtmarkörer", patterns: [/troponin/i, /^tnt$/i, /^tni$/i, /bnp/i, /nt-probnp/i, /ck-mb/i, /myoglobin/i] },
+  { name: "Glukos/Metabolism", patterns: [/glukos/i, /hba1c/i, /laktat/i, /^p-glukos/i, /blodsocker/i] },
+  { name: "Blodgas", patterns: [/blodgas/i, /artärblodgas/i, /abg/i, /venös.*gas/i, /^ph$/i, /pco2/i, /po2/i, /be$/i, /bikarbonat/i] },
+  { name: "Thyroidea", patterns: [/tsh/i, /t3/i, /t4/i, /fritt.*t4/i, /thyroid/i, /sköldkörtel/i] },
+];
+
+function groupLabTests(undersokningar: string[]): { grouped: { [key: string]: string[] }; ungrouped: string[] } {
+  const grouped: { [key: string]: string[] } = {};
+  const ungrouped: string[] = [];
+  const assigned = new Set<number>();
+
+  undersokningar.forEach((item, index) => {
+    for (const group of labGroups) {
+      if (group.patterns.some(pattern => pattern.test(item))) {
+        if (!grouped[group.name]) {
+          grouped[group.name] = [];
+        }
+        grouped[group.name].push(item);
+        assigned.add(index);
+        return;
+      }
+    }
+  });
+
+  undersokningar.forEach((item, index) => {
+    if (!assigned.has(index)) {
+      ungrouped.push(item);
+    }
+  });
+
+  return { grouped, ungrouped };
+}
+
 export function ManagementSection({ handlaggning }: ManagementSectionProps) {
   return (
     <div className="space-y-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
@@ -61,27 +102,56 @@ export function ManagementSection({ handlaggning }: ManagementSectionProps) {
           </div>
           
           <div className="space-y-4">
-            {handlaggning.utredning.map((utredning, index) => (
-              <div key={index} className="p-4 rounded-xl bg-muted/30 border border-border/50">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="font-semibold text-foreground">{utredning.typ}</span>
-                  <Badge 
-                    variant="outline" 
-                    className={prioritetConfig[utredning.prioritet]?.badge || prioritetConfig.elektiv.badge}
-                  >
-                    {prioritetConfig[utredning.prioritet]?.label || utredning.prioritet}
-                  </Badge>
-                </div>
-                <ul className="space-y-1.5">
-                  {utredning.undersokningar.map((undersokning, i) => (
-                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      {undersokning}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+              {handlaggning.utredning.map((utredning, index) => {
+                const isLab = utredning.typ.toLowerCase().includes('lab');
+                const { grouped, ungrouped } = isLab 
+                  ? groupLabTests(utredning.undersokningar) 
+                  : { grouped: {}, ungrouped: utredning.undersokningar };
+                const groupKeys = Object.keys(grouped);
+                
+                return (
+                  <div key={index} className="p-4 rounded-xl bg-muted/30 border border-border/50">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="font-semibold text-foreground">{utredning.typ}</span>
+                      <Badge 
+                        variant="outline" 
+                        className={prioritetConfig[utredning.prioritet]?.badge || prioritetConfig.elektiv.badge}
+                      >
+                        {prioritetConfig[utredning.prioritet]?.label || utredning.prioritet}
+                      </Badge>
+                    </div>
+                    
+                    {isLab && groupKeys.length > 0 ? (
+                      <ul className="space-y-1.5">
+                        {groupKeys.map((groupName) => (
+                          <li key={groupName} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            <span>
+                              <span className="font-medium text-foreground">{groupName}</span>
+                              <span className="text-muted-foreground/70"> ({grouped[groupName].join(', ')})</span>
+                            </span>
+                          </li>
+                        ))}
+                        {ungrouped.map((item, i) => (
+                          <li key={`ungrouped-${i}`} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <ul className="space-y-1.5">
+                        {utredning.undersokningar.map((undersokning, i) => (
+                          <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            {undersokning}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}
