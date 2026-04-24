@@ -1,7 +1,10 @@
-import { FileText, ListChecks, ShieldAlert, BookOpen, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { FileText, ListChecks, ShieldAlert, BookOpen, ExternalLink, Copy, Check } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { DiagnosisCard } from "./DiagnosisCard";
 import { ManagementSection } from "./ManagementSection";
+import { toast } from "sonner";
 
 // Map common medical sources to their URLs
 const sourceUrlMap: Record<string, string> = {
