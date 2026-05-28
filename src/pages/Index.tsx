@@ -113,7 +113,24 @@ const Index = () => {
                   disabled={isLoading}
                 />
               </div>
-              <div className="flex justify-end">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="model-select" className="text-sm text-muted-foreground whitespace-nowrap">
+                    Model
+                  </Label>
+                  <Select value={model} onValueChange={setModel} disabled={isLoading}>
+                    <SelectTrigger id="model-select" className="w-[200px] rounded-xl bg-background/50 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MODEL_OPTIONS.map((m) => (
+                        <SelectItem key={m.value} value={m.value}>
+                          {m.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button
                   type="submit"
                   disabled={isLoading || !symptoms.trim()}
