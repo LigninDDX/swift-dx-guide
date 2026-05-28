@@ -4,14 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { DiagnosisResults } from "@/components/DiagnosisResults";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const MODEL_OPTIONS = [
+  { value: "google/gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+  { value: "google/gemini-2.5-flash", label: "Gemini 2.5 Flash" },
+];
 
 const Index = () => {
   const [symptoms, setSymptoms] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [model, setModel] = useState<string>("google/gemini-2.5-flash");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +34,7 @@ const Index = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("diagnose", {
-        body: { symptoms: symptoms.trim() },
+        body: { symptoms: symptoms.trim(), model },
       });
 
       if (error) {
@@ -105,7 +113,24 @@ const Index = () => {
                   disabled={isLoading}
                 />
               </div>
-              <div className="flex justify-end">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Label htmlFor="model-select" className="text-sm text-muted-foreground whitespace-nowrap">
+                    Model
+                  </Label>
+                  <Select value={model} onValueChange={setModel} disabled={isLoading}>
+                    <SelectTrigger id="model-select" className="w-[200px] rounded-xl bg-background/50 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MODEL_OPTIONS.map((m) => (
+                        <SelectItem key={m.value} value={m.value}>
+                          {m.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <Button
                   type="submit"
                   disabled={isLoading || !symptoms.trim()}
